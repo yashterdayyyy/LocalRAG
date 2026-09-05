@@ -19,4 +19,19 @@ export async function ingestTextIntoChroma(
 
     const chunks = await splitter.splitText(text);
     const collection = await getOrCreateCollection(collectionName);
+
+    // Function or logic to save the chunks to chromaDB
+    await collection?.add({
+        ids: chunks.map((_, index) => `${filePath}__${index}`),
+        documents: chunks,
+        metadatas: chunks?.map((_, i) => ({
+            ...metadata,
+            filePath,
+            chunkIndex: i,
+        })),
+
+    });
+    console.log(`Ingested ${chunks?.length} chunks from ${filePath}`)
+
+    return true;
 }
