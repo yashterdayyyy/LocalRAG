@@ -3,7 +3,8 @@ name: Ingest Knowledge Base
 on:
   push:
     paths:
-      - "./knowledge/**"
+      - "knowledge/**"
+  workflow_dispatch:
 
 jobs:
   ingest:
@@ -11,27 +12,29 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
 
       - name: Detect changed files
         id: changes
-        uses: tj-actions/changed-files@v43
+        uses: tj-actions/changed-files@v46
         with:
-          files: "knowledge/**"
-      - name: Injest changed files
+          files: knowledge/**
+
+      - name: Ingest changed files
+        if: steps.changes.outputs.any_changed == 'true'
         env:
-          INGEST_API_URL: "https://unsent-ruse-barracuda.ngrok-free.dev/api/injest"
-          INGEST_API_KEY: ${{ secrets.INGEST_API_KEY}}
+          INGEST_API_URL: https://unsent-ruse-barracuda.ngrok-free.dev/api/injest
+          INGEST_API_KEY: ${{ secrets.INGEST_API_KEY }}
         run: |
-          for file in ${{ steps.changes.outputs.all_changed_files}} ; do
-            echo"Ingesting file: $file" 
-              curl -X POST "$INGEST_API_URL" \
+          set -euo pipefail
+          for file in ${{ steps.changes.outputs.all_changed_files }}; do
+            echo "Ingesting file: $file"
+            jq -n --arg path "$file" --rawfile content "$file" '{filePath: $path, content: $content}' \
+              | curl -sS -f -X POST "$INGEST_API_URL" \
                 -H "Authorization: Bearer $INGEST_API_KEY" \
                 -H "Content-Type: application/json" \
-                --data-raw "${jq ... -n\
-                -- arg path "$file"\
-                "{
-                  "filePath":"$file",
-                  "content":$content
-                  }"
-            
+                -H "ngrok-skip-browser-warning: true" \
+                --data-binary @-
+            echo
           done

@@ -38,4 +38,5 @@ Retrieval-Augmented Generation (RAG) optimizes the output of Large Language Mode
 - **Hallucination Prevention**: Output is strictly anchored to validated domain documentation.
 - **Dynamic Updates**: New information is available immediately upon document indexing without expensive model fine-tuning.
 - **Privacy & Security**: Internal company documentation remains secure and under access-controlled vector stores.
-- **Conclusion**: This is the current state of the machines and growing at current pace
+- **Conclusion**: This is the current state of the machines and growing at current pace.
+- **GitHub Action probe (2026-09-06)**: If ingestion worked, this sentence is stored in Chroma as a new chunk from `knowledge/rag_system_guide.md`.
