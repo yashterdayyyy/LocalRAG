@@ -109,7 +109,7 @@ Workflow: **Ingest Knowledge Base** (`.github/workflows/convertToEmbeddings.yml`
 
 CI ingest only succeeds if **Next is running on port 3000** and **ngrok is forwarding** to the URL in the workflow file.
 
-## Not implemented
+## Future Scope
 
 - Query embedding and top-k retrieval
 - Prompt grounding / LLM answers
