@@ -4,7 +4,7 @@ on:
   push:
     paths:
       - "./knowledge/**"
-
+      
 jobs:
   ingest:
     runs-on: ubuntu-latest
@@ -16,10 +16,10 @@ jobs:
         id: changes
         uses: tj-actions/changed-files@v43
         with:
-          files: "knowledge/**"
+          files: 'knowledge/**'
       - name: Injest changed files
         env:
-          INGEST_API_URL: " https://unsent-ruse-barracuda.ngrok-free.dev"
+          INGEST_API_URL: "https://unsent-ruse-barracuda.ngrok-free.dev"
           INGEST_API_KEY: ${{ secrets.INGEST_API_KEY}}
         run: |
           for file in ${{ steps.changes.outputs.all_changed_files}} ; do
@@ -35,5 +35,5 @@ jobs:
                   }"
             
           done
-
-
+          
+              
