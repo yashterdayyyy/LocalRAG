@@ -1,0 +1,39 @@
+name: Ingest Knowledge Base
+
+on:
+  push:
+    paths:
+      - "./knowledge/**"
+      
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Detect changed files
+        id: changes
+        uses: tj-actions/changed-files@v43
+        with:
+          files: 'knowledge/**'
+      - name: Injest changed files
+        env:
+          INGEST_API_URL: "https://localhost:3000/api/injest"
+          INGEST_API_KEY: ${{ secrets.INGEST_API_KEY}}
+        run: |
+          for file in ${{ steps.changes.outputs.all_changed_files}} ; do
+            echo"Ingesting file: $file" 
+              curl -X POST "$INGEST_API_URL" \
+                -H "Authorization: Bearer $INGEST_API_KEY" \
+                -H "Content-Type: application/json" \
+                --data-raw "${jq ... -n\
+                -- arg path "$file"\
+                "{
+                  "filePath":"$file",
+                  "content":$content
+                  }"
+            
+          done
+          
+              
