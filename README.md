@@ -2,6 +2,13 @@
 
 AI-powered personal knowledge assistant built with Next.js. Ingest markdown from `knowledge/`, embed it into **Chroma Cloud**, and chat with streaming RAG answers backed by **Gemini** and **MongoDB** session history.
 
+## Credits / based on
+
+This project was built following the **Build Your Own ChatGPT** RAG series:
+
+- Docs: [Coding Adda — Introduction](https://docs.addacoding.in/docs/projects/build-your-own-chatgpt/01-introduction)
+- Video playlist: [Build Your Own CHATGPT (YouTube)](https://www.youtube.com/playlist?list=PLI7xwGSSw_fJepk_EVoTRAR9kmisLdKI5)
+
 Live flow:
 
 ```
