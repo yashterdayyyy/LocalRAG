@@ -1,85 +1,80 @@
 # LocalRAG
 
-Next.js 16 app that ingests markdown from this repo into **Chroma Cloud** (collection `secondbrain`). Query, retrieval, and a chat UI are not built yet.
+AI-powered personal knowledge assistant built with Next.js. Ingest markdown from `knowledge/`, embed it into **Chroma Cloud**, and chat with streaming RAG answers backed by **Gemini** and **MongoDB** session history.
 
-## What works today
+Live flow:
 
 ```
-knowledge/*.md  →  git push  →  GitHub Action  →  ngrok  →  POST /api/injest  →  chunk  →  Chroma Cloud
+knowledge/*.md → ingest (API / script / GitHub Action) → Chroma Cloud
+                                                      ↓
+Browser chat UI  →  /api/chat  →  hybrid search + Gemini stream  →  Mongo history
 ```
 
-- Markdown under `knowledge/` is the source of truth the Action watches.
-- `POST /api/injest` hashes content, deletes previous chunks for that `filePath` if the hash changed, then splits and writes vectors.
-- Chunking uses LangChain `RecursiveCharacterTextSplitter` (`chunkSize: 1200`, `chunkOverlap: 200`).
-- Chroma Cloud embeds on `collection.add` (default embedding function). Collection name: `secondbrain`.
+## Features
+
+- Landing page, docs, and full chat UI with sidebar sessions
+- Streaming answers via Vercel AI SDK + Gemini
+- Hybrid retrieval (semantic Chroma + lexical MiniSearch)
+- Persistent chat sessions/messages in MongoDB
+- Knowledge ingest with content hashing and re-chunking
+- GitHub Action to ingest changed `knowledge/**` files on push
 
 ## Stack
 
 | Layer | Tech |
 |---|---|
-| App | Next.js 16 (App Router, webpack), React 19, TypeScript |
-| Ingest API | `app/api/injest/route.ts` (Node runtime) |
-| Splitter | `@langchain/textsplitters` |
+| App | Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS, Framer Motion |
+| Chat | `@ai-sdk/react`, `ai`, `@ai-sdk/google` |
+| Embeddings / LLM | Google Gemini (`gemini-embedding-001`, `gemini-flash-latest`) |
 | Vector store | Chroma Cloud (`chromadb` `CloudClient`) |
+| Sessions | MongoDB |
+| Ingest | LangChain text splitter + `/api/injest` |
 | CI | `.github/workflows/convertToEmbeddings.yml` |
-| Tunnel | ngrok → local `localhost:3000` |
-
-`package.json` also lists AI SDK, OpenAI, MongoDB, Postgres, Prisma, PDF/DOCX parsers, and chat UI libraries. Those are **not used** by the current ingest path.
 
 ## Repo layout
 
 ```
 app/
-  api/injest/route.ts     Ingest endpoint
-  page.tsx                Default Next.js starter page
-  layout.tsx              Root layout
-public/lib/
-  chromaClient.ts         Chroma Cloud + Gemini clients
-  chunkAndIngest.ts       Split text and collection.add
-knowledge/                Documents the GitHub Action ingests
-scripts/test_injest_route.mjs   Local smoke tests against localhost:3000
-.github/workflows/convertToEmbeddings.yml
+  page.tsx                 Landing page
+  docs/page.tsx            Documentation UI
+  chat/                    Chat shell + session pages
+  api/chat/                Streaming RAG endpoint
+  api/sessions/            Create / list chat sessions
+  api/messages/[sessionId] Load / delete messages
+  api/injest/              Ingest markdown into Chroma
+  components/              UI + chat helpers
+lib/
+  chromaClient.ts          Chroma Cloud + Gemini embeddings
+  chunkAndIngest.ts        Chunking + collection.add
+  hybridSearch.ts          Semantic + lexical retrieval
+  mongodb.ts               Mongo client
+  chatSessions.ts          Session helpers
+  chatMessages.ts          Message helpers
+knowledge/                 Source docs watched by the Action
+scripts/reingest-all.ts    Wipe collection and re-ingest all knowledge
+public/uploads/            Images referenced from knowledge markdown
 ```
-
-`public/knowledge/` holds sample markdown. It is **not** watched by the Action.
-
-## API
-
-`POST /api/injest`
-
-```json
-{
-  "filePath": "knowledge/rag_system_guide.md",
-  "content": "<full file text>"
-}
-```
-
-| Response | When |
-|---|---|
-| `400` `"Missing filePath or content"` | Body incomplete |
-| `200` `"File already ingested"` | Stored `fileHash` equals SHA-256 hex of `content` |
-| `200` `{ "status": "ingested", "filePath": "..." }` | Chunks written |
-
-The route reads `CHROMA_API_KEY` but does **not** check `Authorization`. The Action still sends `Bearer ${{ secrets.INGEST_API_KEY }}`.
-
-Chunk records in Chroma:
-
-- **id:** `{filePath}__{chunkIndex}`
-- **document:** chunk text
-- **metadata:** `filePath`, `chunkIndex`, `fileHash` (`parseInt(sha256Hex, 16)`)
 
 ## Environment
 
-Create `.env` (gitignored):
+Copy `.env.example` to `.env` (gitignored) and fill in:
 
-```
+```env
+GOOGLE_GENERATIVE_AI_API_KEY=
+
 CHROMA_API_KEY=
 CHROMA_TENANT=
 CHROMA_DATABASE=
-GOOGLE_GENERATIVE_AI_API_KEY=
+
+# Either works:
+MONGODB_URI=mongodb+srv://USER:PASSWORD@cluster.mongodb.net/?retryWrites=true&w=majority
+# MONGO_URL=mongodb+srv://USER:PASSWORD@cluster.mongodb.net/?retryWrites=true&w=majority
 ```
 
-GitHub repo secret used by the workflow: `INGEST_API_KEY`.
+GitHub Actions secrets (for auto-ingest):
+
+- `INGEST_API_URL` — public URL of your deployed `/api/injest`
+- `INGEST_API_KEY` — must match `CHROMA_API_KEY` (Bearer token)
 
 ## Run locally
 
@@ -88,29 +83,60 @@ npm install
 npm run dev
 ```
 
-App: [http://localhost:3000](http://localhost:3000)
+Open [http://localhost:3000](http://localhost:3000).
 
-Ingest smoke test (requires the dev server):
+### First-time knowledge load
+
+If Chroma is empty or you hit embedding dimension mismatches, recreate and ingest:
 
 ```bash
-node scripts/test_injest_route.mjs
+npx tsx scripts/reingest-all.ts
 ```
 
-Test 1 in that script expects `401` if no auth header; the route currently does not return `401`. Tests 2–3 match missing-body / ingest behavior.
+Or POST a single file (dev server must be running):
+
+```bash
+curl -X POST http://localhost:3000/api/injest \
+  -H "Authorization: Bearer $CHROMA_API_KEY" \
+  -H "Content-Type: application/json" \
+  --data-binary @- <<'EOF'
+{"filePath":"knowledge/rag_system_guide.md","content":"...file text..."}
+EOF
+```
+
+Collection name: `secondbrain` (Gemini embeddings, 3072 dimensions).
+
+## API overview
+
+| Endpoint | Purpose |
+|---|---|
+| `POST /api/sessions` | Create a chat session |
+| `GET /api/sessions` | List recent sessions |
+| `GET /api/messages/:sessionId` | Load message history |
+| `DELETE /api/messages/:sessionId` | Delete session + messages |
+| `POST /api/chat?sessionId=...` | Streaming RAG reply |
+| `POST /api/injest` | Ingest/update a knowledge file (Bearer auth required) |
+
+### Ingest payload
+
+```json
+{
+  "filePath": "knowledge/rag_system_guide.md",
+  "content": "<full file text>"
+}
+```
+
+Responses: `401` unauthorized, `400` invalid body, `{ "status": "skipped" }` unchanged hash, `{ "status": "ingested", "filePath": "..." }` on write.
 
 ## GitHub Action
 
 Workflow: **Ingest Knowledge Base** (`.github/workflows/convertToEmbeddings.yml`)
 
-- **Triggers:** push to `knowledge/**`, or `workflow_dispatch`
-- Checks out with `fetch-depth: 2`
-- Lists changed files with `tj-actions/changed-files@v46`
-- For each file, `jq` builds `{ filePath, content }` and `curl` POSTs to the ngrok ingest URL (hardcoded in the workflow), including `ngrok-skip-browser-warning`
+- Triggers on push to `knowledge/**` or `workflow_dispatch`
+- Detects changed files and POSTs each to `INGEST_API_URL` with `Authorization: Bearer $INGEST_API_KEY`
 
-CI ingest only succeeds if **Next is running on port 3000** and **ngrok is forwarding** to the URL in the workflow file.
+## Notes
 
-## Future Scope
-
-- Query embedding and top-k retrieval
-- Prompt grounding / LLM answers
-- Chat UI (`app/page.tsx` is still the create-next-app template)
+- Chat answers use retrieved context only; empty Chroma → weak or “not in LocalRAG yet” answers.
+- Do not commit `.env`. Rotate keys if they were ever shared.
+- `public/lib/*` re-exports `lib/*` for backward compatibility.

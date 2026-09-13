@@ -1,0 +1,14 @@
+version: "3.8"
+
+services:
+  chroma:
+    image: ghcr.io/chroma-core/chroma:latest
+    container_name: chroma
+    environment:
+      - IS_PERSISTENT=TRUE
+      - PERSIST_DIRECTORY=/chroma/chroma
+    volumes:
+      - ./chroma-data:/chroma/chroma
+    ports:
+      - "8000:8000"
+    restart: unless-stopped

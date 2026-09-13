@@ -1,8 +1,7 @@
 import crypto from "crypto";
-import { NextRequest, NextResponse } from "next/server";
-import { ingestTextIntoChroma } from "@/public/lib/chunkAndIngest";
-import { getOrCreateCollection } from "@/public/lib/chromaClient";
-import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
+import { NextRequest } from "next/server";
+import { ingestTextIntoChroma } from "@/lib/chunkAndIngest";
+import { getOrCreateCollection } from "@/lib/chromaClient";
 
 export const runtime = "nodejs";
 
@@ -13,34 +12,43 @@ function hashContent(text: string) {
 }
 
 export async function POST(req: NextRequest) {
-  const { filePath, content, testMode } = await req.json();
+  const auth = req.headers.get("authorization");
+  if (auth !== `Bearer ${API_KEY}`) {
+    return new Response("Unauthorized", { status: 401 });
+  }
+
+  const { filePath, content } = await req.json();
 
   if (!filePath || !content) {
-    return new Response("Missing filePath or content", { status: 400 });
+    return new Response("Invalid payload", { status: 400 });
   }
 
   const collection = await getOrCreateCollection("secondbrain");
   const fileHash = hashContent(content);
 
+  // 🔍 Check if file already ingested with same hash
   const existing = await collection.get({
     where: { filePath },
     include: ["metadatas"],
   });
-  const existingHash = existing?.metadatas?.[0]?.fileHash;
+
+  const existingHash = existing.metadatas?.[0]?.fileHash;
 
   if (existingHash === fileHash) {
-    return new Response("File already ingested", { status: 200 });
+    // console.log(`Skipping unchanged file: ${filePath}`);
+    return Response.json({ status: "skipped" });
   }
 
-  //Delete the old chunks
-  await collection?.delete({ where: { filePath } });
+  // ♻️ Delete old chunks
+  await collection.delete({ where: { filePath } });
 
-  //Ingest the new content
-  await ingestTextIntoChroma("secondbrain", filePath, content, {
-    fileHash: parseInt(fileHash, 16),
-  });
-  return Response.json({
-    status: "ingested",
+  // ➕ Ingest new content
+  await ingestTextIntoChroma(
+    "secondbrain",
     filePath,
-  });
+    content,
+    { fileHash: parseInt(fileHash, 16) }
+  );
+
+  return Response.json({ status: "ingested", filePath });
 }

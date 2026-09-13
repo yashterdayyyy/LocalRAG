@@ -1,69 +1,159 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import { motion } from "framer-motion";
+import { Button } from "@/app/components/ui/Button";
+import { Card } from "@/app/components/ui/Card";
+import { Brain, Search, Clock, Shield, ArrowRight, Github, Sparkles } from "lucide-react";
+import Link from "next/link";
+import { HeroHighlight } from "@/app/components/ui/HeroHighlight";
+
+export default function LandingPage() {
+  const container = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  const item = {
+    hidden: { opacity: 0, y: 20 },
+    show: { opacity: 1, y: 0 }
+  };
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+    <div className="relative min-h-screen overflow-hidden bg-black selection:bg-blue-500/30 text-white">
+      {/* Navigation */}
+      <nav className="fixed top-0 w-full z-50 border-b border-white/5 bg-black/50 backdrop-blur-xl">
+        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-2 group cursor-pointer">
+            <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center group-hover:rotate-12 transition-transform shadow-[0_0_15px_rgba(79,70,229,0.5)]">
+              <Brain className="w-5 h-5 text-white" />
+            </div>
+            <span className="font-bold text-xl tracking-tight text-white/90">
+              Local<span className="text-indigo-500">RAG</span>
+            </span>
+          </div>
+
+          <div className="flex items-center gap-4">
+            <Link href="https://github.com/yashterdayyyy/LocalRAG" target="_blank">
+              <Button variant="ghost" size="icon" className="hover:bg-white/10">
+                <Github className="w-5 h-5" />
+              </Button>
+            </Link>
+            <Link href="/chat">
+              <Button variant="primary" size="sm" className="cursor-pointer bg-indigo-600 hover:bg-indigo-700 shadow-[0_0_15px_rgba(79,70,229,0.3)]">
+                Get Started
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </nav>
+
+      {/* Hero Section */}
+      <HeroHighlight>
+        <div className="max-w-4xl mx-auto text-center px-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-indigo-500/20 bg-indigo-500/10 text-indigo-400 text-xs font-medium mb-6">
+              <Sparkles className="w-3 h-3" />
+              <span>Next-Gen Knowledge Management</span>
+            </div>
+            <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-8 leading-tight">
+              Unlock the Power of Your <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-b from-indigo-300 to-indigo-600">
+                LocalRAG
+              </span>
+            </h1>
+            <p className="max-w-2xl mx-auto text-zinc-400 text-lg md:text-xl mb-10 leading-relaxed font-light">
+              Transform your scattered notes into a structured knowledge engine.
+              Our AI understands your context and surfaces insights instantly.
+            </p>
+
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <Link href="/chat">
+                <Button size="lg" className="rounded-full group px-8 bg-indigo-600 hover:bg-indigo-700 text-white border-none shadow-[0_0_20px_rgba(79,70,229,0.4)]">
+                  Launch LocalRAG
+                  <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </Button>
+              </Link>
+              <Link href="/docs">
+                <Button variant="secondary" size="lg" className="rounded-full px-8 bg-white/5 hover:bg-white/10 border-white/10">
+                  Documentation
+                </Button>
+              </Link>
+            </div>
+          </motion.div>
+        </div>
+      </HeroHighlight>
+
+      {/* Feature Grid */}
+      <section className="py-24 px-6 bg-zinc-950/50">
+        <div className="max-w-7xl mx-auto">
+          <motion.div
+            variants={container}
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true }}
+            className="grid grid-cols-1 md:grid-cols-3 gap-8"
+          >
+            {[
+              {
+                icon: <Search className="w-6 h-6 text-indigo-400" />,
+                title: "Semantic Understanding",
+                description: "Not just keyword matching. We understand the meaning behind your queries across all documents."
+              },
+              {
+                icon: <Clock className="w-6 h-6 text-purple-400" />,
+                title: "Real-time Retrieval",
+                description: "Optimized vector search ensures your answers are generated in milliseconds, not minutes."
+              },
+              {
+                icon: <Shield className="w-6 h-6 text-pink-400" />,
+                title: "Built-in Citations",
+                description: "Every answer comes with precise links to your original sources for complete transparency."
+              }
+            ].map((feature, i) => (
+              <motion.div key={i} variants={item}>
+                <Card className="h-full bg-zinc-900/40 border-white/5 hover:border-indigo-500/50 transition-colors p-8">
+                  <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 flex items-center justify-center mb-6 border border-indigo-500/20">
+                    {feature.icon}
+                  </div>
+                  <h3 className="text-xl font-bold mb-3">{feature.title}</h3>
+                  <p className="text-zinc-400 leading-relaxed font-light">
+                    {feature.description}
+                  </p>
+                </Card>
+              </motion.div>
+            ))}
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="py-12 border-t border-white/5 px-6">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8">
+          <div className="flex items-center gap-2">
+            <div className="size-6 rounded bg-indigo-600 flex items-center justify-center">
+              <Brain className="w-3.5 h-3.5 text-white" />
+            </div>
+            <span className="font-bold tracking-tight">LocalRAG</span>
+          </div>
+          <p className="text-sm text-zinc-500 font-light">
+            &copy; 2026 LocalRAG. Powered by Gemini.
           </p>
+          <div className="flex items-center gap-6">
+            <Link href="https://github.com/yashterdayyyy/LocalRAG" className="text-zinc-500 hover:text-white transition-colors">
+              <Github className="w-5 h-5" />
+            </Link>
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+      </footer>
     </div>
   );
 }
