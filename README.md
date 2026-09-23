@@ -145,5 +145,4 @@ Workflow: **Ingest Knowledge Base** (`.github/workflows/convertToEmbeddings.yml`
 ## Notes
 
 - Chat answers use retrieved context only; empty Chroma → weak or “not in LocalRAG yet” answers.
-- Do not commit `.env`. Rotate keys if they were ever shared.
-- `public/lib/*` re-exports `lib/*` for backward compatibility.
+- Do not commit `.env`. Copy `.env.example` → `.env` and fill in real keys. Rotate keys if they were ever shared.
