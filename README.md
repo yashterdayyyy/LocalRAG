@@ -1,3 +1,4 @@
+[![SlopTeacher](http://localhost:3000/api/badge/qdhE1u9gQGVH3jaGbKcKZJVSYcJ-nups44gXCPcF1xY.iQggavo95xuOq8nbsjbUTGYryTWyd48W1ra-Jto04pc.svg)](http://localhost:3000/b/qdhE1u9gQGVH3jaGbKcKZJVSYcJ-nups44gXCPcF1xY.iQggavo95xuOq8nbsjbUTGYryTWyd48W1ra-Jto04pc)
 # LocalRAG
 
 AI-powered personal knowledge assistant built with Next.js. Ingest markdown from `knowledge/`, embed it into **Chroma Cloud**, and chat with streaming RAG answers backed by **Gemini** and **MongoDB** session history.
