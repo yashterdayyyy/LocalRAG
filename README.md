@@ -1,4 +1,4 @@
-[![SlopTeacher](https://app.slopteacher.com/api/badge/qdhE1u9gQGVH3jaGbKcKZJVSYcJ-nups44gXCPcF1xY.iQggavo95xuOq8nbsjbUTGYryTWyd48W1ra-Jto04pc.svg)](https://app.slopteacher.com/b/qdhE1u9gQGVH3jaGbKcKZJVSYcJ-nups44gXCPcF1xY.iQggavo95xuOq8nbsjbUTGYryTWyd48W1ra-Jto04pc)
+[![SlopTeacher](https://app.slopteacher.com/api/badge/hyrzyhxGKAc2RjA-qiD88He8qQJnEkDsZv2BtAe8MUo.h6AHpaq8ZrEVfwhdiywDbc2DjHcWglRCmB0UAo0QZQc.svg)](https://app.slopteacher.com/b/hyrzyhxGKAc2RjA-qiD88He8qQJnEkDsZv2BtAe8MUo.h6AHpaq8ZrEVfwhdiywDbc2DjHcWglRCmB0UAo0QZQc)
 # LocalRAG
 
 AI-powered personal knowledge assistant built with Next.js. Ingest markdown from `knowledge/`, embed it into **Chroma Cloud**, and chat with streaming RAG answers backed by **Gemini** and **MongoDB** session history.
