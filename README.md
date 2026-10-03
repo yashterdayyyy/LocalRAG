@@ -1,4 +1,4 @@
-[![SlopTeacher](https://app.slopteacher.com/api/badge/f8WhSFCx5bpHV2qsS9zfqfEs7hJk4jThGrJ0j0KNc5Y.72v6lfwcc1CZcXPk9LydEZf9ZPpX3ILkST76CPYafTU.svg)](https://app.slopteacher.com/b/f8WhSFCx5bpHV2qsS9zfqfEs7hJk4jThGrJ0j0KNc5Y.72v6lfwcc1CZcXPk9LydEZf9ZPpX3ILkST76CPYafTU)
+
 # LocalRAG
 
 AI-powered personal knowledge assistant built with Next.js. Ingest markdown from `knowledge/`, embed it into **Chroma Cloud**, and chat with streaming RAG answers backed by **Gemini** and **MongoDB** session history.
