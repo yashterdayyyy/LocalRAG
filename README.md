@@ -1,6 +1,6 @@
 [![SlopTeacher](https://app.slopteacher.com/api/badge/_EyAHT6ymk0w3eIONJ3PA7Pfi2FoqPBHUVM_G0z06oE.9SK-tBlQReumfLkf6kPCdKg_4OteR6TVRCWWvk3Ko2Q.svg)](https://app.slopteacher.com/b/_EyAHT6ymk0w3eIONJ3PA7Pfi2FoqPBHUVM_G0z06oE.9SK-tBlQReumfLkf6kPCdKg_4OteR6TVRCWWvk3Ko2Q)
 
-The above is an example of slopteacher. my new product.Visit [Slopteacher](https://www.slopteacher.com/)
+The above is an example of Slopteacher. my new product. Visit [Slopteacher](https://www.slopteacher.com/)
 # LocalRAG
 
 AI-powered personal knowledge assistant built with Next.js. Ingest markdown from `knowledge/`, embed it into **Chroma Cloud**, and chat with streaming RAG answers backed by **Gemini** and **MongoDB** session history.
@@ -9,7 +9,7 @@ AI-powered personal knowledge assistant built with Next.js. Ingest markdown from
 
 This project was built following the **Build Your Own ChatGPT** RAG series:
 
-- Docs: [Coding Adda — Introduction](https://docs.addacoding.in/docs/projects/build-your-own-chatgpt/01-introduction)
+- Docs: [Coding Adda - Introduction](https://docs.addacoding.in/docs/projects/build-your-own-chatgpt/01-introduction)
 - Video playlist: [Build Your Own CHATGPT (YouTube)](https://www.youtube.com/playlist?list=PLI7xwGSSw_fJepk_EVoTRAR9kmisLdKI5)
 
 Live flow:
